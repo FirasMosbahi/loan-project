@@ -1,26 +1,34 @@
-const {kafka} = require("./libs/kafka-utils");
+const { Kafka ,  } = require('kafkajs')
 
-const producer = kafka.producer()
+const kafka = new Kafka({
+    clientId: 'commercial service',
+    brokers: ['localhost:9092'],
+})
 
-
-const consumer = kafka.consumer({ groupId: 'test-group' })
 
 
 async function main() {
 
+    const producer = kafka.producer()
+
     await producer.connect()
+
+    const consumer = kafka.consumer({ groupId: 'commercial service group' })
+
 
     await consumer.connect()
 
-    await consumer.subscribe({ topic: 'commercial-service', fromBeginning: true })
+    await consumer.subscribe({ topic: 'commercial-service', fromBeginning: false })
 
     console.log("application connected")
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
+            console.log("hello")
             // console.log({
             //     value: message.value.toString(),
             // })
+            console.log(message)
             const {id , request} = JSON.parse(message.value.toString())
             if(id) {
                 console.log(`received message from ${id} with document ${request}`)
